@@ -1,0 +1,10 @@
+hello|hi
+hi|hello
+how are you|i am fine
+what is your name|my name is mini bot
+good morning|good morning
+good evening|good evening
+bye|goodbye
+thank you|you are welcome
+who created you|i was created using python
+what can you do|i can chat with you
