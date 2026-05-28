@@ -97,6 +97,7 @@ class MultiHeadAttention(nn.Module):
         # Step 5: Softmax normalization to get attention probabilities
         # Shape: (batch_size, num_heads, seq_len, seq_len)
         attention_weights = F.softmax(scores, dim=-1)
+        self.last_attention_weights = attention_weights.detach()
         
         # Step 6: Multiply attention weights by Value vectors
         # (batch_size, num_heads, seq_len, seq_len) x (batch_size, num_heads, seq_len, d_k)

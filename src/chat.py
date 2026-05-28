@@ -126,6 +126,9 @@ class ChatbotPipeline:
         # Save the new exchange to memory
         self.history.append((user_message, response_text))
         
+        # Store full sequence IDs for visualizer inspection
+        self.last_input_ids = input_ids
+        
         return response_text
 
     def clear_memory(self):
