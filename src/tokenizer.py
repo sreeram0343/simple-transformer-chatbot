@@ -2,16 +2,19 @@ from collections import Counter
 import os
 
 class Tokenizer:
-    """
-    A simple word-level Tokenizer designed for our custom chatbot.
-    
-    Special Tokens:
-    - <PAD>: Used to make sequences in a batch the same length (ID: 0).
-    - <UNK>: Represents words that are not in our vocabulary (ID: 1).
-    - <SEP>: Separates the User prompt from the Bot response (ID: 2).
-    - <EOS>: Signals the End of Sentence/Response (ID: 3).
+    """A simple word-level Tokenizer designed for our custom chatbot.
+
+    This tokenizer handles word-to-ID mapping and ID-to-word decoding,
+    supporting special tokens for padding, unknown words, sequence
+    separation, and end-of-sequence marking.
+
+    Attributes:
+        vocab (dict): Mapping from word strings to integer IDs.
+        inv_vocab (dict): Mapping from integer IDs back to word strings.
+        special_tokens (dict): Internal map of special token IDs.
     """
     def __init__(self):
+        """Initializes the tokenizer with basic special tokens."""
         # 1. Initialize vocabulary with special tokens
         self.vocab = {
             "<PAD>": 0,
@@ -23,8 +26,10 @@ class Tokenizer:
         self.inv_vocab = {v: k for k, v in self.vocab.items()}
 
     def train(self, texts: list[str]):
-        """
-        Builds the vocabulary from a list of sentence strings.
+        """Builds the vocabulary from a list of sentence strings.
+
+        Args:
+            texts (list[str]): A list of strings to use for vocabulary building.
         """
         counter = Counter()
         for text in texts:
@@ -41,8 +46,14 @@ class Tokenizer:
         self.inv_vocab = {v: k for k, v in self.vocab.items()}
 
     def encode(self, text: str, add_eos: bool = False) -> list[int]:
-        """
-        Converts a raw text string into a list of token IDs.
+        """Converts a raw text string into a list of token IDs.
+
+        Args:
+            text (str): The raw input string to encode.
+            add_eos (bool): Whether to append the <EOS> token ID at the end.
+
+        Returns:
+            list[int]: A list of integer token IDs representing the text.
         """
         words = text.lower().split()
         token_ids = [self.vocab.get(word, self.vocab["<UNK>"]) for word in words]
@@ -53,8 +64,14 @@ class Tokenizer:
         return token_ids
 
     def decode(self, token_ids: list[int], skip_special: bool = True) -> str:
-        """
-        Converts a list of token IDs back into a readable string.
+        """Converts a list of token IDs back into a readable string.
+
+        Args:
+            token_ids (list[int]): A list of token IDs to decode.
+            skip_special (bool): If True, special tokens like <PAD> are omitted.
+
+        Returns:
+            str: The reconstructed string from the token IDs.
         """
         words = []
         for tid in token_ids:
@@ -70,9 +87,18 @@ class Tokenizer:
 
 
 def load_conversations(file_path: str) -> list[tuple[str, str]]:
-    """
-    Loads conversation pairs from data/conversations.txt.
-    Format is expected to be: user_prompt|bot_response
+    """Loads conversation pairs from a text file.
+
+    Expects a file where each line is formatted as: user_prompt|bot_response.
+
+    Args:
+        file_path (str): The path to the conversations text file.
+
+    Returns:
+        list[tuple[str, str]]: A list of tuples containing (user, bot) strings.
+
+    Raises:
+        FileNotFoundError: If the specified file_path does not exist.
     """
     pairs = []
     if not os.path.exists(file_path):
