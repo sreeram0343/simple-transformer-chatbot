@@ -58,37 +58,52 @@ The model follows the modern "Pre-LN" Transformer variant, ensuring stable train
 
 ---
 
-## 🚀 How to Run the Project
+## 🛠️ Installation & Setup
 
-### 1. Install Dependencies
-Ensure you have Python 3.8+ installed, then install PyTorch:
+### Prerequisites
+- **Python 3.8+**
+- **pip** (Python package manager)
+- **Git**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/sreeram0343/simple-transformer-chatbot.git
+cd simple-transformer-chatbot
+```
+
+### 2. Create a Virtual Environment (Recommended)
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Train the Chatbot (Stages 6 - 9)
-Train the custom Transformer on our conversations dataset by running the master training loop. It will train for 40 epochs, display loss progression, and serialize weights to `chatbot_model.pt` and vocabulary keys to `vocab.json`:
+---
+
+## ⚡ Quick Start
+
+### Option A: The Desktop Dashboard (GUI)
+Experience the full power of the project with a modern graphical interface.
 ```bash
+python ui/app.py
+```
+
+### Option B: Command Line Interface (CLI)
+For those who prefer the terminal.
+```bash
+# Train the model first
 python train.py
-```
 
-### 3. Evaluate the Model (Stage 13)
-Quantify model performance and check if the training succeeded by running the evaluation script:
-```bash
-python src/evaluate.py
-```
-This will report:
-* **Average Loss**
-* **Perplexity (PPL)**
-* **Next-Token Prediction Accuracy**
-
-### 4. Chat with the Chatbot (Stages 10 - 12)
-Launch the CLI interface to talk with your trained model. The chatbot uses **greedy autoregressive decoding** and possesses a **conversation memory buffer**:
-```bash
+# Start chatting
 python src/chat.py
 ```
-* Type `clear` to wipe conversation memory.
-* Type `exit` to quit.
 
 ---
 
