@@ -153,6 +153,15 @@ Where $M_{ij} = -\infty$ for $j > i$.
 
 ---
 
+## 📚 Documentation
+
+For more detailed information, please refer to the following:
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
@@ -170,5 +179,20 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
+
+## 🖋️ Citation
+
+If you use this project in your research or educational material, please cite it as:
+
+```bibtex
+@misc{simple-transformer-chatbot,
+  author = {Sreeram},
+  title = {Simple Transformer Chatbot From Scratch},
+  year = {2026},
+  publisher = {GitHub},
+  journal = {GitHub Repository},
+  howpublished = {\url{https://github.com/sreeram0343/simple-transformer-chatbot}}
+}
+```
 
 Happy Learning! You've built a GPT-like generative bot entirely from scratch!
