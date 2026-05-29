@@ -1,8 +1,22 @@
-# 🔮 Custom Transformer Chatbot From Scratch
+# 🔮 Simple Transformer Chatbot From Scratch
 
-Welcome to the **Transformer Chatbot From Scratch**! This is a complete learning project designed to teach the inner workings of generative decoder-only Transformer models (like the GPT series) by implementing every component manually using **Python** and **PyTorch**—without using any ready-made libraries like Hugging Face.
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/sreeram0343/simple-transformer-chatbot)
+
+A professional, educational implementation of a **Generative Decoder-Only Transformer** (GPT-style) built entirely from the ground up. This project avoids high-level abstractions like Hugging Face to provide a transparent look into the mechanics of modern NLP.
 
 ---
+
+## 🌟 Project Philosophy
+
+This repository is designed as a deep-dive learning resource. We implement every mathematical component of the Transformer architecture manually using **Python** and **PyTorch**, bridging the gap between theoretical papers and production-grade code.
+
+### What makes this project unique?
+- **Zero-Abstraction**: No `transformers` library. Just raw tensors and logic.
+- **Interactive Visuals**: Real-time attention heatmaps and training monitoring.
+- **End-to-End**: Covers everything from raw text tokenization to autoregressive inference.
 
 ## 🗺️ The 14-Stage Learning Journey
 
