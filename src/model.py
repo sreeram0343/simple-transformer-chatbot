@@ -4,22 +4,20 @@ from positional_encoding import PositionalEncoding
 from transformer_block import TransformerBlock
 
 class TransformerChatbot(nn.Module):
-    """
-    A complete Decoder-only GPT-style Transformer Chatbot.
-    
-    Why it exists:
-    This class ties together all the individual components we built:
-    1. Token Embeddings: Maps token IDs to vectors.
-    2. Positional Encoding: Injects spatial position information.
-    3. Transformer Blocks: A stacked series of attention and feed-forward sub-layers.
-    4. Language Modeling Head (lm_head): Projects the final representation vectors back into
-       a probability distribution (logits) over our vocabulary to predict the next word.
-       
-    Weight Tying:
-    We share the weights between the token embedding layer and the language modeling head.
-    Since they perform complementary mappings (ID -> Vector and Vector -> Logits), sharing
-    their parameters acts as a strong regularizer, drastically reduces total model size,
-    and speeds up convergence.
+    """A complete Decoder-only GPT-style Transformer Chatbot.
+
+    This class integrates all sub-components including token embeddings,
+    positional encoding, stacked transformer blocks, and a language
+    modeling head. It implements weight tying between the embedding
+    layer and the output projection head for improved regularization
+    and efficiency.
+
+    Attributes:
+        token_embeddings (nn.Embedding): Maps token IDs to continuous vectors.
+        positional_encoding (PositionalEncoding): Injects spatial information.
+        blocks (nn.ModuleList): A stack of TransformerBlock modules.
+        ln_final (nn.LayerNorm): Final normalization layer.
+        lm_head (nn.Linear): Projects representations to vocabulary logits.
     """
     def __init__(
         self, 
@@ -31,15 +29,16 @@ class TransformerChatbot(nn.Module):
         max_len: int = 128, 
         dropout: float = 0.1
     ):
-        """
+        """Initializes the TransformerChatbot.
+
         Args:
-            vocab_size: Total number of unique tokens in our vocabulary.
-            d_model: Dimensionality of the token embedding space.
-            num_heads: Number of attention heads in each Transformer Block.
-            d_ff: Intermediate dimension in the Feed-Forward networks.
-            num_layers: Number of Transformer Blocks to stack.
-            max_len: Maximum sequence length supported by the positional encoding.
-            dropout: Dropout probability.
+            vocab_size (int): Total number of unique tokens in the vocabulary.
+            d_model (int): Dimensionality of the token embedding space.
+            num_heads (int): Number of attention heads in each block.
+            d_ff (int): Intermediate dimension in the Feed-Forward networks.
+            num_layers (int): Number of Transformer Blocks to stack.
+            max_len (int): Maximum sequence length supported.
+            dropout (float): Dropout probability for regularization.
         """
         super(TransformerChatbot, self).__init__()
         
@@ -69,12 +68,14 @@ class TransformerChatbot(nn.Module):
         self.token_embeddings.weight = self.lm_head.weight
 
     def forward(self, input_ids: torch.Tensor, mask: torch.Tensor = None) -> torch.Tensor:
-        """
+        """Performs a forward pass through the Transformer.
+
         Args:
-            input_ids: Tensor of token IDs: shape (batch_size, seq_len)
-            mask: Optional causal/look-ahead mask: shape (seq_len, seq_len)
+            input_ids (torch.Tensor): Tensor of token IDs with shape (batch_size, seq_len).
+            mask (torch.Tensor, optional): Causal/look-ahead mask with shape (seq_len, seq_len).
+
         Returns:
-            logits: Log-probabilities over the vocabulary for each token: shape (batch_size, seq_len, vocab_size)
+            torch.Tensor: Logits over the vocabulary with shape (batch_size, seq_len, vocab_size).
         """
         batch_size, seq_len = input_ids.shape
         
