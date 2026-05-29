@@ -128,4 +128,47 @@ The project includes a sophisticated **CustomTkinter** dashboard that provides a
 * **Weight Tying**: We tied `token_embeddings.weight` directly to `lm_head.weight`. This binds input mapping and output projection parameters, cutting model size down and preventing overfitting on small vocabularies.
 * **Instruction-Tuning Target Masking**: Setting user tokens to `-100` targets allows PyTorch's `CrossEntropyLoss` to bypass calculating gradients for predicting user inputs, training the model solely to formulate bot answers.
 
+---
+
+## 🔬 Mathematical Foundations
+
+The core of this chatbot is the **Scaled Dot-Product Attention**, defined as:
+
+$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
+
+In our implementation, we add a causal mask $M$ to the dot product before the softmax:
+
+$$ \text{CausalAttention}(Q, K, V) = \text{softmax}\left(\frac{QK^T + M}{\sqrt{d_k}}\right)V $$
+
+Where $M_{ij} = -\infty$ for $j > i$.
+
+---
+
+## 🗺️ Future Roadmap
+
+- [ ] **Byte-Pair Encoding (BPE)**: Transition from word-level to subword-level tokenization.
+- [ ] **Top-k / Nucleus Sampling**: Move beyond greedy search for more creative responses.
+- [ ] **Multi-GPU Support**: Distribute training across multiple hardware accelerators.
+- [ ] **Deeper Transformers**: Scale up to 6+ layers for better conversation quality.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you find a bug or have a feature request, please open an issue or submit a pull request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
 Happy Learning! You've built a GPT-like generative bot entirely from scratch!
