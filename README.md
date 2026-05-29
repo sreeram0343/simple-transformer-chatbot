@@ -107,7 +107,20 @@ python src/chat.py
 
 ---
 
-## 💡 Key Architectural Details to Remember
+## 🖥️ The Interactive Dashboard
+
+The project includes a sophisticated **CustomTkinter** dashboard that provides a window into the model's brain.
+
+### Key Tabs:
+1. **💬 Conversation Chat**: An interactive chat interface with a "typing..." indicator and persistent conversation memory.
+2. **🔄 Model Training**: A dedicated panel to launch background training threads, with a live-updating Matplotlib loss chart and progress bar.
+3. **📊 Insights & Visuals**:
+    - **Attention Heatmaps**: Visualize exactly which tokens the model is focusing on during generation.
+    - **Tokenization Table**: A breakdown of how the input text is split into internal IDs and special tokens.
+
+---
+
+## 💡 Technical Deep Dive
 
 * **Trigonometric PE**: Standard sinusoidal curves are deterministic and allow training sequences to scale larger.
 * **Causal Masking**: Upper-triangular elements are filled with $-\infty$ so the softmax ignores future look-ahead tokens, enforcing causal unidirectional generation.
