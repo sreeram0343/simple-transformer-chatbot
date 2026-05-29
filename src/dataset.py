@@ -3,35 +3,47 @@ from torch.utils.data import Dataset, DataLoader
 from tokenizer import Tokenizer, load_conversations
 
 class ConversationDataset(Dataset):
-    """
-    Custom PyTorch Dataset for training a Decoder-only Transformer Chatbot.
-    
-    How it works:
-    For a conversation pair (e.g., User: "hello", Bot: "hi"), we concatenate them:
-        Sequence: "hello" + "<SEP>" + "hi" + "<EOS>"
-        
-    We construct two tensors:
-    1. input_ids: The token IDs for the sequence above, padded with <PAD> to max_len.
-    2. labels: The target labels. To train the model to ONLY predict the Bot's
-       response, we set the target label for the User's tokens and the <SEP> token
-       to -100. PyTorch's CrossEntropyLoss ignores -100, so no gradients are computed
-       for predicting the user prompt. The Bot tokens and <EOS> keep their original IDs.
+    """Custom PyTorch Dataset for training a Decoder-only Transformer Chatbot.
+
+    This dataset handles the concatenation of user prompts and bot
+    responses, applies causal masking by setting target labels for user
+    input to -100 (ignored by CrossEntropyLoss), and pads sequences to
+    a fixed maximum length.
+
+    Attributes:
+        pairs (list[tuple[str, str]]): List of (user_prompt, bot_response) strings.
+        tokenizer (Tokenizer): A trained Tokenizer instance.
+        max_len (int): The maximum sequence length.
     """
     def __init__(self, pairs: list[tuple[str, str]], tokenizer: Tokenizer, max_len: int = 16):
-        """
+        """Initializes the ConversationDataset.
+
         Args:
-            pairs: List of (user_prompt, bot_response) strings.
-            tokenizer: An initialized and trained Tokenizer instance.
-            max_len: The maximum sequence length to pad/truncate to.
+            pairs (list[tuple[str, str]]): List of (user_prompt, bot_response) strings.
+            tokenizer (Tokenizer): An initialized and trained Tokenizer instance.
+            max_len (int): The maximum sequence length to pad/truncate to.
         """
         self.pairs = pairs
         self.tokenizer = tokenizer
         self.max_len = max_len
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """Returns the total number of conversation pairs in the dataset.
+
+        Returns:
+            int: The dataset length.
+        """
         return len(self.pairs)
 
     def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
+        """Retrieves a single conversation item from the dataset.
+
+        Args:
+            idx (int): The index of the item to retrieve.
+
+        Returns:
+            dict[str, torch.Tensor]: A dictionary containing 'input_ids' and 'labels' tensors.
+        """
         user, bot = self.pairs[idx]
         
         # 1. Encode user prompt and bot response
