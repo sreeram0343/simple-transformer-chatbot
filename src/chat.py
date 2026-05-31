@@ -1,8 +1,13 @@
+import logging
 import sys
 import os
 import json
 import torch
 from typing import List, Tuple, Dict, Optional
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Add 'src' directory to Python path to ensure clean imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -162,21 +167,21 @@ class ChatbotPipeline:
 # INTERACTIVE CHAT INTERFACE (STAGE 11)
 # =====================================================================
 def run_chat_interface():
-    print("\n" + "=" * 60)
-    print("         🔮 WELCOME TO THE CUSTOM TRANSFORMER CHATBOT! 🔮")
-    print("=" * 60)
-    print("[*] Loading chatbot pipeline...")
+    logger.info("=" * 60)
+    logger.info("         🔮 WELCOME TO THE CUSTOM TRANSFORMER CHATBOT! 🔮")
+    logger.info("=" * 60)
+    logger.info("[*] Loading chatbot pipeline...")
     
     try:
         pipeline = ChatbotPipeline(model_path="chatbot_model.pt", vocab_path="vocab.json")
-        print("[+] Chatbot ready! Actively waiting for your inputs.")
+        logger.info("[+] Chatbot ready! Actively waiting for your inputs.")
         print("\nCommands:")
         print(" - Type 'exit' to quit the chatbot.")
         print(" - Type 'clear' to wipe conversation memory.")
         print("-" * 60)
     except Exception as e:
-        print(f"\n[ERROR] Failed to load chatbot files: {e}")
-        print("[!] Make sure to run 'python train.py' first to train and save the model!")
+        logger.error(f"Failed to load chatbot files: {e}")
+        logger.info("[!] Make sure to run 'python train.py' first to train and save the model!")
         return
 
     while True:
@@ -187,12 +192,12 @@ def run_chat_interface():
                 continue
                 
             if user_input.lower() == "exit":
-                print("\nMini Bot: Goodbye! Have a great day!")
+                logger.info("Goodbye! Have a great day!")
                 break
                 
             if user_input.lower() == "clear":
                 pipeline.clear_memory()
-                print("\n[System] Conversation memory cleared!")
+                logger.info("Conversation memory cleared!")
                 continue
                 
             # Generate and print response
@@ -200,7 +205,7 @@ def run_chat_interface():
             print(f"Mini Bot: {response}")
             
         except KeyboardInterrupt:
-            print("\n\nMini Bot: Goodbye!")
+            logger.info("Goodbye!")
             break
 
 if __name__ == "__main__":

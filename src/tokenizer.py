@@ -1,6 +1,11 @@
+import logging
 from collections import Counter
 import os
 from typing import Dict, List, Tuple, Optional
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class Tokenizer:
     """A simple word-level Tokenizer designed for our custom chatbot.
@@ -121,16 +126,16 @@ def load_conversations(file_path: str) -> List[Tuple[str, str]]:
 # DEMO / VERIFICATION ZONE
 # =====================================================================
 if __name__ == "__main__":
-    print("=== TOKENIZER & DATASET DEMO ===")
+    logger.info("=== TOKENIZER & DATASET DEMO ===")
     
     # 1. Load data
     data_path = "data/conversations.txt"
     pairs = load_conversations(data_path)
-    print(f"\nLoaded {len(pairs)} conversation pairs from '{data_path}'")
-    print(f"Sample pair 0: User: '{pairs[0][0]}' | Bot: '{pairs[0][1]}'")
+    logger.info(f"Loaded {len(pairs)} conversation pairs from '{data_path}'")
+    logger.info(f"Sample pair 0: User: '{pairs[0][0]}' | Bot: '{pairs[0][1]}'")
     
     # Extract flat list of sentences to train tokenizer
-    flat_texts = []
+    flat_texts: List[str] = []
     for user, bot in pairs:
         flat_texts.append(user)
         flat_texts.append(bot)
@@ -138,15 +143,15 @@ if __name__ == "__main__":
     # 2. Train Tokenizer
     tokenizer = Tokenizer()
     tokenizer.train(flat_texts)
-    print(f"\nTokenizer Vocabulary Size: {len(tokenizer.vocab)}")
-    print(f"Special Tokens: {list(tokenizer.vocab.keys())[:4]}")
+    logger.info(f"Tokenizer Vocabulary Size: {len(tokenizer.vocab)}")
+    logger.info(f"Special Tokens: {list(tokenizer.vocab.keys())[:4]}")
     
     # 3. Encode & Decode Test
     sample = "Hello how are you"
     encoded = tokenizer.encode(sample, add_eos=True)
     decoded = tokenizer.decode(encoded, skip_special=False)
     
-    print(f"\nTest Encoding:")
-    print(f"- Text: '{sample}'")
-    print(f"- Encoded: {encoded}")
-    print(f"- Decoded (with specials): '{decoded}'")
+    logger.info(f"Test Encoding:")
+    logger.info(f"- Text: '{sample}'")
+    logger.info(f"- Encoded: {encoded}")
+    logger.info(f"- Decoded (with specials): '{decoded}'")
