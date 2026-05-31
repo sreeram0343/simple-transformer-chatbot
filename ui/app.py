@@ -158,9 +158,9 @@ class TransformerChatbotApp(ctk.CTk):
         ctk.set_appearance_mode("Dark")
         ctk.set_default_color_theme("blue")
         
-        self.title("🔮 Custom Transformer Chatbot Dashboard")
-        self.geometry("1040x680")
-        self.minsize(980, 600)
+        self.title("🔮 NEURAL ORCHESTRATOR :: CORE INTERFACE")
+        self.geometry("1100x720")
+        self.minsize(1000, 640)
         self.configure(fg_color=st.BG_MAIN)
         
         # 2. CONFIGURE RESPONSIVE GRID LAYOUT
@@ -189,7 +189,7 @@ class TransformerChatbotApp(ctk.CTk):
             self,
             fg_color=st.BG_MAIN,
             segmented_button_fg_color=st.BG_PANEL,
-            segmented_button_selected_color=st.ACCENT_PRIMARY,
+            segmented_button_selected_color=st.ACCENT_PRIMARY_CONTAINER,
             segmented_button_selected_hover_color=st.ACCENT_HOVER,
             segmented_button_unselected_color=st.BG_CARD,
             text_color=st.TEXT_MAIN,
@@ -198,9 +198,9 @@ class TransformerChatbotApp(ctk.CTk):
         self.main_tabview.grid(row=0, column=1, padx=20, pady=(15, 20), sticky="nsew")
         
         # Add dashboards
-        self.tab_chat = self.main_tabview.add("💬 Conversation Chat")
-        self.tab_train = self.main_tabview.add("🔄 Model Training")
-        self.tab_visual = self.main_tabview.add("📊 Insights & Visuals")
+        self.tab_chat = self.main_tabview.add("💬 NEURAL CHAT")
+        self.tab_train = self.main_tabview.add("🔄 MODEL SYNTHESIS")
+        self.tab_visual = self.main_tabview.add("📊 CORE INSIGHTS")
         
         # Configure expansion for tabs
         for tab in [self.tab_chat, self.tab_train, self.tab_visual]:

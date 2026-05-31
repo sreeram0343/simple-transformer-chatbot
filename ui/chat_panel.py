@@ -26,17 +26,17 @@ class ChatPanel(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=1)  # Message scrollable area takes full height
         
         # 1. HEADER BAR
-        self.header = ctk.CTkFrame(self, fg_color=st.BG_PANEL, height=50, corner_radius=0)
+        self.header = ctk.CTkFrame(self, fg_color=st.BG_PANEL, height=60, corner_radius=0)
         self.header.grid(row=0, column=0, sticky="ew")
         self.header.grid_columnconfigure(0, weight=1)
         
         self.header_title = ctk.CTkLabel(
             self.header,
-            text="💬 Chat Interface",
+            text="💬 NEURAL CHAT INTERFACE",
             font=st.FONT_SUBTITLE,
-            text_color=st.TEXT_MAIN
+            text_color=st.ACCENT_PRIMARY
         )
-        self.header_title.grid(row=0, column=0, padx=20, pady=12, sticky="w")
+        self.header_title.grid(row=0, column=0, padx=24, pady=15, sticky="w")
         
         # 2. SCROLLABLE CONVERSATION VIEWPORT
         self.chat_viewport = ctk.CTkScrollableFrame(
@@ -48,7 +48,7 @@ class ChatPanel(ctk.CTkFrame):
         self.chat_viewport.grid_columnconfigure(0, weight=1)
         
         # 3. INPUT CONTROL PANEL (Bottom Bar)
-        self.input_container = ctk.CTkFrame(self, fg_color=st.BG_PANEL, height=75, corner_radius=0)
+        self.input_container = ctk.CTkFrame(self, fg_color=st.BG_PANEL, height=80, corner_radius=0)
         self.input_container.grid(row=2, column=0, sticky="ew")
         self.input_container.grid_columnconfigure(0, weight=1)
         self.input_container.grid_rowconfigure(0, weight=1)
@@ -56,33 +56,34 @@ class ChatPanel(ctk.CTkFrame):
         # Text entry box
         self.entry = ctk.CTkEntry(
             self.input_container,
-            placeholder_text="Message Mini Bot...",
+            placeholder_text="Enter neural prompt...",
             font=st.FONT_BODY,
             fg_color=st.BG_INPUT,
-            border_color=st.BG_CARD,
+            border_color=st.ACCENT_SECONDARY,
+            border_width=1,
             text_color=st.TEXT_MAIN,
             placeholder_text_color=st.TEXT_MUTED,
             corner_radius=st.CORNER_RADIUS_MD
         )
-        self.entry.grid(row=0, column=0, padx=(20, 10), pady=18, sticky="ew")
+        self.entry.grid(row=0, column=0, padx=(24, 12), pady=20, sticky="ew")
         self.entry.bind("<Return>", lambda event: self.send_message())  # Press Enter key to send
         
         # Send button
         self.send_btn = ctk.CTkButton(
             self.input_container,
-            text="Send ⚡",
+            text="GENERATE ⚡",
             font=st.FONT_HEADER,
-            width=80,
-            fg_color=st.ACCENT_PRIMARY,
+            width=100,
+            fg_color=st.ACCENT_PRIMARY_CONTAINER,
             hover_color=st.ACCENT_HOVER,
             text_color=st.TEXT_MAIN,
             corner_radius=st.CORNER_RADIUS_MD,
             command=self.send_message
         )
-        self.send_btn.grid(row=0, column=1, padx=(0, 20), pady=18, sticky="ns")
+        self.send_btn.grid(row=0, column=1, padx=(0, 24), pady=20, sticky="ns")
         
         # Display initial greeting
-        self.add_message("Bot", "Hi! I am Mini Bot, your scratch-built Transformer chatbot. Let's chat!")
+        self.add_message("Bot", "Interface initialized. Neural network online. How can I assist your inquiry today?")
 
     def send_message(self):
         """Extracts text from input and triggers callback."""
@@ -103,32 +104,36 @@ class ChatPanel(ctk.CTkFrame):
         """Creates and appends a beautifully padded alternating speech bubble."""
         # Main row container
         row_frame = ctk.CTkFrame(self.chat_viewport, fg_color="transparent")
-        row_frame.grid(row=len(self.message_widgets), column=0, padx=15, pady=8, sticky="ew")
+        row_frame.grid(row=len(self.message_widgets), column=0, padx=20, pady=10, sticky="ew")
         row_frame.grid_columnconfigure(0, weight=1)
         
         # Setup sender styling
-        timestamp = time.strftime("%H:%M")
+        timestamp = time.strftime("%H:%M:%S")
         
         if sender == "User":
             bubble_bg = st.BUBBLE_USER_BG
+            bubble_border = 0
+            border_color = "transparent"
             text_color = st.BUBBLE_USER_FG
             sticky_side = "e"  # Align to right
-            pad_left = 60      # Reserve gap on left side
+            pad_left = 80      # Reserve gap on left side
             pad_right = 0
-            bubble_align = "e"
         else:
             bubble_bg = st.BUBBLE_BOT_BG
+            bubble_border = 1
+            border_color = st.BUBBLE_BOT_BORDER
             text_color = st.BUBBLE_BOT_FG
             sticky_side = "w"  # Align to left
             pad_left = 0
-            pad_right = 60     # Reserve gap on right side
-            bubble_align = "w"
+            pad_right = 80     # Reserve gap on right side
 
         # Speech bubble card
         bubble_card = ctk.CTkFrame(
             row_frame, 
             fg_color=bubble_bg, 
-            corner_radius=st.CORNER_RADIUS_MD
+            border_width=bubble_border,
+            border_color=border_color,
+            corner_radius=st.CORNER_RADIUS_LG
         )
         bubble_card.grid(row=0, column=0, padx=(pad_left, pad_right), sticky=sticky_side)
         
@@ -139,18 +144,18 @@ class ChatPanel(ctk.CTkFrame):
             font=st.FONT_BODY,
             text_color=text_color,
             justify="left",
-            wraplength=420  # Wraps long lines to next line gracefully
+            wraplength=450  # Wraps long lines to next line gracefully
         )
-        lbl.grid(row=0, column=0, padx=15, pady=(10, 4), sticky="w")
+        lbl.grid(row=0, column=0, padx=18, pady=(12, 6), sticky="w")
         
         # Small timestamp display
         t_lbl = ctk.CTkLabel(
             bubble_card,
-            text=f"{sender} • {timestamp}",
-            font=st.FONT_MUTED_SMALL,
+            text=f"[{sender.upper()} :: {timestamp}]",
+            font=st.FONT_CODE,
             text_color=st.TEXT_MUTED if sender == "Bot" else "#d8b4fe"
         )
-        t_lbl.grid(row=1, column=0, padx=15, pady=(0, 6), sticky="e")
+        t_lbl.grid(row=1, column=0, padx=18, pady=(0, 8), sticky="e")
         
         self.message_widgets.append(row_frame)
         self.update_viewport_scroll()
@@ -161,22 +166,24 @@ class ChatPanel(ctk.CTkFrame):
             return
             
         self.typing_indicator_widget = ctk.CTkFrame(self.chat_viewport, fg_color="transparent")
-        self.typing_indicator_widget.grid(row=len(self.message_widgets) + 1, column=0, padx=15, pady=8, sticky="ew")
+        self.typing_indicator_widget.grid(row=len(self.message_widgets) + 1, column=0, padx=20, pady=10, sticky="ew")
         
         bubble = ctk.CTkFrame(
             self.typing_indicator_widget, 
             fg_color=st.BUBBLE_BOT_BG, 
-            corner_radius=st.CORNER_RADIUS_MD
+            border_width=1,
+            border_color=st.BUBBLE_BOT_BORDER,
+            corner_radius=st.CORNER_RADIUS_LG
         )
-        bubble.grid(row=0, column=0, padx=(0, 60), sticky="w")
+        bubble.grid(row=0, column=0, padx=(0, 80), sticky="w")
         
         lbl = ctk.CTkLabel(
             bubble,
-            text="Mini Bot is thinking...",
-            font=(st.FONT_FAMILY, 11, "italic"),
-            text_color=st.TEXT_MUTED
+            text="SYNTHESIZING RESPONSE...",
+            font=st.FONT_CODE,
+            text_color=st.ACCENT_SECONDARY
         )
-        lbl.grid(row=0, column=0, padx=18, pady=12)
+        lbl.grid(row=0, column=0, padx=20, pady=15)
         
         self.update_viewport_scroll()
 

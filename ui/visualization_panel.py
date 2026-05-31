@@ -28,18 +28,18 @@ class VisualizationPanel(ctk.CTkFrame):
             self,
             fg_color=st.BG_CARD,
             segmented_button_fg_color=st.BG_MAIN,
-            segmented_button_selected_color=st.ACCENT_PRIMARY,
+            segmented_button_selected_color=st.ACCENT_PRIMARY_CONTAINER,
             segmented_button_selected_hover_color=st.ACCENT_HOVER,
-            segmented_button_unselected_color=st.BG_PANEL,
+            segmented_button_unselected_color=st.BG_INPUT,
             text_color=st.TEXT_MAIN,
             corner_radius=st.CORNER_RADIUS_LG
         )
         self.tabview.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
         
         # Create separate tabs
-        self.tab_tokens = self.tabview.add("🪙 Tokenization Grid")
-        self.tab_attention = self.tabview.add("🧠 Self-Attention Matrix")
-        self.tab_architecture = self.tabview.add("🧱 Model Architecture")
+        self.tab_tokens = self.tabview.add("🪙 NEURAL TOKENS")
+        self.tab_attention = self.tabview.add("🧠 ATTENTION GRADIENT")
+        self.tab_architecture = self.tabview.add("🧱 CORE SCHEMATIC")
         
         # Configure grid for all tabs to maximize sizing
         for tab in [self.tab_tokens, self.tab_attention, self.tab_architecture]:
@@ -66,29 +66,29 @@ class VisualizationPanel(ctk.CTkFrame):
         # Header Info
         ctk.CTkLabel(
             frame,
-            text="🪙 Token-to-ID Numerical Vector Mapping",
+            text="🪙 TOKEN-TO-VECTOR MAPPING",
             font=st.FONT_SUBTITLE,
-            text_color=st.TEXT_MAIN
+            text_color=st.ACCENT_PRIMARY
         ).grid(row=0, column=0, pady=(0, 5), sticky="w")
         
         ctk.CTkLabel(
             frame,
-            text="Transformers read numbers, not words. The sentence is tokenized, mapped to unique IDs, and passed to the model.",
+            text="The engine decomposes linguistic input into a numerical sequence. Each word is mapped to a high-density vector ID for neural processing.",
             font=st.FONT_BODY,
             text_color=st.TEXT_MUTED
         ).grid(row=1, column=0, pady=(0, 20), sticky="w")
         
         # Scrollable table list
-        self.tokens_scroll = ctk.CTkScrollableFrame(frame, fg_color=st.BG_INPUT, corner_radius=st.CORNER_RADIUS_MD)
+        self.tokens_scroll = ctk.CTkScrollableFrame(frame, fg_color=st.BG_INPUT, border_width=1, border_color=st.ACCENT_SECONDARY, corner_radius=st.CORNER_RADIUS_MD)
         self.tokens_scroll.grid(row=2, column=0, sticky="nsew")
         self.tokens_scroll.grid_columnconfigure(0, weight=1)
         self.tokens_scroll.grid_columnconfigure(1, weight=1)
         self.tokens_scroll.grid_columnconfigure(2, weight=1)
         
         # Table Header
-        self._create_table_header(self.tokens_scroll, "Word Token", 0)
-        self._create_table_header(self.tokens_scroll, "Token ID", 1)
-        self._create_table_header(self.tokens_scroll, "Internal Meaning Type", 2)
+        self._create_table_header(self.tokens_scroll, "NODE TOKEN", 0)
+        self._create_table_header(self.tokens_scroll, "VECTOR ID", 1)
+        self._create_table_header(self.tokens_scroll, "SYNAPTIC CLASS", 2)
         
         # Placeholder row
         self.token_rows = []
@@ -101,9 +101,9 @@ class VisualizationPanel(ctk.CTkFrame):
         lbl = ctk.CTkLabel(
             parent,
             text=text,
-            font=st.FONT_HEADER,
-            text_color=st.ACCENT_LIGHT,
-            pady=8
+            font=st.FONT_CODE,
+            text_color=st.ACCENT_SECONDARY,
+            pady=10
         )
         lbl.grid(row=0, column=col, sticky="nsew", padx=10)
 
@@ -145,14 +145,14 @@ class VisualizationPanel(ctk.CTkFrame):
         # Header Info
         ctk.CTkLabel(
             frame,
-            text="🧠 Self-Attention Matrix Heatmap",
+            text="🧠 SELF-ATTENTION HEATMAP",
             font=st.FONT_SUBTITLE,
-            text_color=st.TEXT_MAIN
+            text_color=st.ACCENT_SECONDARY
         ).grid(row=0, column=0, pady=(0, 5), sticky="w")
         
         ctk.CTkLabel(
             frame,
-            text="Displays attention scores between each pair of tokens. Darker spots indicate stronger attention weights (the model connects these words).",
+            text="Visualizing the cross-weighted attention scores. Deep saturation represents higher neural focus between tokens.",
             font=st.FONT_BODY,
             text_color=st.TEXT_MUTED
         ).grid(row=1, column=0, pady=(0, 10), sticky="w")
@@ -184,16 +184,16 @@ class VisualizationPanel(ctk.CTkFrame):
         self.attn_ax.clear()
         
         # Plot 2D heatmap using imshow
-        im = self.attn_ax.imshow(attention_matrix, cmap="Purples", vmin=0.0, vmax=1.0, aspect="auto")
+        im = self.attn_ax.imshow(attention_matrix, cmap="viridis", vmin=0.0, vmax=1.0, aspect="auto")
         
         # Show all ticks and label them with the respective list entries
         self.attn_ax.set_xticks(np.arange(len(tokens)))
         self.attn_ax.set_yticks(np.arange(len(tokens)))
-        self.attn_ax.set_xticklabels(tokens, color=st.TEXT_MAIN, fontname=st.FONT_FAMILY, fontsize=8, rotation=45, ha="right")
-        self.attn_ax.set_yticklabels(tokens, color=st.TEXT_MAIN, fontname=st.FONT_FAMILY, fontsize=8)
+        self.attn_ax.set_xticklabels(tokens, color=st.TEXT_MAIN, fontname=st.FONT_CODE_FAMILY, fontsize=8, rotation=45, ha="right")
+        self.attn_ax.set_yticklabels(tokens, color=st.TEXT_MAIN, fontname=st.FONT_CODE_FAMILY, fontsize=8)
         
         # Add labels and title
-        self.attn_ax.set_title("Scaled Dot-Product Attention Heatmap (Head 0)", color=st.TEXT_MAIN, fontsize=10, pad=12)
+        self.attn_ax.set_title("SCALED DOT-PRODUCT ATTENTION (HEAD 0)", color=st.TEXT_MAIN, fontname=st.FONT_CODE_FAMILY, fontsize=10, pad=12)
         
         # Style spines
         for spine in self.attn_ax.spines.values():
@@ -225,59 +225,56 @@ class VisualizationPanel(ctk.CTkFrame):
         
         ctk.CTkLabel(
             scroll,
-            text="🧱 Custom GPT-Style Decoder-Only Architecture",
+            text="🧱 NEURAL CORE SCHEMATIC (GPT-DECODER)",
             font=st.FONT_SUBTITLE,
-            text_color=st.TEXT_MAIN
+            text_color=st.ACCENT_PRIMARY
         ).grid(row=0, column=0, pady=(0, 15), sticky="w")
         
         # 1. Inputs Block
         self._create_arch_block(
             scroll, "1. INPUT SEQUENCE & ENCODING", 
-            "Input Text -> Token ID Sequence of shape: (batch_size, seq_len)\ne.g. 'hello how are you' -> [4, 18, 12, 16]\nPadding is added at the end up to max_len (32 tokens).", 
+            "Input Text -> Token ID Sequence of shape: (batch_size, seq_len)\nPadding is added at the end up to max_len (32 tokens).", 
             1
         )
         
         # 2. Embeddings Block
         self._create_arch_block(
             scroll, "2. REPRESENTATION & POSITIONING", 
-            "Token Embedding (d_model=32) + Sinusoidal Positional Encoding (d_model=32)\n- Adds continuous vectors to mapping IDs.\n- Injects positional coordinates using sine & cosine waveforms.\nResulting shape: (batch_size, seq_len, 32)", 
+            "Token Embedding (d_model=32) + Sinusoidal Positional Encoding (d_model=32)\nResulting shape: (batch_size, seq_len, 32)", 
             2
         )
         
         # 3. Stacked Block
         self._create_arch_block(
-            scroll, "3. STACKED TRANSFORMER BLOCKS (x2 Stacked)", 
-            "For each block, the sequence passes through:\n\n"
+            scroll, "3. STACKED TRANSFORMER BLOCKS (x2 STACKED)", 
             "↳ Pre-Layer Normalization 1\n"
-            "↳ Multi-Head Attention (4 Parallel Heads, d_k = 32 / 4 = 8 Dimensions per head)\n"
-            "  - Uses Causal Masking (upper-triangular -inf) to block looking at future tokens.\n"
-            "↳ Residual Skip Addition (x = x + Attention(Norm(x)))\n\n"
+            "↳ Multi-Head Attention (4 Parallel Heads, d_k = 8)\n"
+            "↳ Residual Skip Addition\n"
             "↳ Pre-Layer Normalization 2\n"
-            "↳ Position-Wise Feed-Forward Network (Linear Expansion d_ff=128 -> GELU -> Dropout -> Linear Projection back to 32)\n"
-            "↳ Residual Skip Addition (x = x + FFN(Norm(x)))", 
+            "↳ Position-Wise Feed-Forward (d_ff=128)\n"
+            "↳ Residual Skip Addition", 
             3
         )
         
         # 4. Heads Block
         self._create_arch_block(
-            scroll, "4. FINAL NORMALIZATION & LANGUAGE MODEL HEAD", 
+            scroll, "4. LANGUAGE MODEL HEAD", 
             "↳ Layer Normalization (Final)\n"
-            "↳ Linear Classification Head (Weights tied directly to Token Embeddings)\n"
-            "  - Projects 32 dimensions up to Vocab Size.\n"
-            "Resulting Output Shape: (batch_size, seq_len, vocab_size) representing raw next-token probabilities (logits).", 
+            "↳ Linear Classification Head (Weights tied to Embeddings)\n"
+            "Resulting Output Shape: (batch_size, seq_len, vocab_size)", 
             4
         )
 
     def _create_arch_block(self, parent, title, body_text, row_idx):
-        card = ctk.CTkFrame(parent, fg_color=st.BG_INPUT, border_color=st.BG_CARD, border_width=1, corner_radius=st.CORNER_RADIUS_MD)
+        card = ctk.CTkFrame(parent, fg_color=st.BG_INPUT, border_color=st.ACCENT_SECONDARY, border_width=1, corner_radius=st.CORNER_RADIUS_MD)
         card.grid(row=row_idx, column=0, padx=0, pady=10, sticky="ew")
         card.grid_columnconfigure(0, weight=1)
         
         ctk.CTkLabel(
             card,
             text=title,
-            font=st.FONT_HEADER,
-            text_color=st.ACCENT_LIGHT
+            font=st.FONT_CODE,
+            text_color=st.ACCENT_SECONDARY
         ).grid(row=0, column=0, padx=20, pady=(15, 5), sticky="w")
         
         ctk.CTkLabel(

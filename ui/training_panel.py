@@ -41,25 +41,25 @@ class TrainingPanel(ctk.CTkFrame):
         self.left_container.grid_columnconfigure(0, weight=1)
         
         # 1. Action Controls Panel
-        self.controls_card = ctk.CTkFrame(self.left_container, fg_color=st.BG_CARD, corner_radius=st.CORNER_RADIUS_LG)
+        self.controls_card = ctk.CTkFrame(self.left_container, fg_color=st.BG_CARD, border_width=1, border_color=st.ACCENT_PRIMARY, corner_radius=st.CORNER_RADIUS_LG)
         self.controls_card.grid(row=0, column=0, padx=0, pady=10, sticky="ew")
         self.controls_card.grid_columnconfigure(0, weight=1)
         self.controls_card.grid_columnconfigure(1, weight=1)
         
         ctk.CTkLabel(
             self.controls_card,
-            text="TRAINING CONTROLLER",
-            font=st.FONT_HEADER,
-            text_color=st.TEXT_MUTED
+            text="SYNAPTIC CONTROLLER",
+            font=st.FONT_CODE,
+            text_color=st.ACCENT_PRIMARY
         ).grid(row=0, column=0, columnspan=2, padx=20, pady=(18, 10), sticky="w")
         
         self.start_btn = ctk.CTkButton(
             self.controls_card,
-            text="▶ Start Training",
+            text="INITIATE TRAINING ▶",
             font=st.FONT_HEADER,
-            fg_color=st.COLOR_SUCCESS,
-            hover_color="#22998f",
-            text_color="#181825",
+            fg_color=st.ACCENT_SECONDARY_CONTAINER,
+            hover_color=st.ACCENT_SECONDARY,
+            text_color="#ffffff",
             corner_radius=st.CORNER_RADIUS_SM,
             command=self.on_start_training
         )
@@ -67,7 +67,7 @@ class TrainingPanel(ctk.CTkFrame):
         
         self.stop_btn = ctk.CTkButton(
             self.controls_card,
-            text="⏹ Stop Training",
+            text="ABORT SEQUENCE ⏹",
             font=st.FONT_HEADER,
             fg_color=st.COLOR_ERROR,
             hover_color="#b52c38",
@@ -81,8 +81,8 @@ class TrainingPanel(ctk.CTkFrame):
         # Progress Bar
         self.progress_label = ctk.CTkLabel(
             self.controls_card,
-            text="Training progress: 0%",
-            font=st.FONT_BODY,
+            text="SYNTHESIS PROGRESS: 0%",
+            font=st.FONT_CODE,
             text_color=st.TEXT_MUTED
         )
         self.progress_label.grid(row=2, column=0, columnspan=2, padx=20, pady=(10, 2), sticky="w")
@@ -90,7 +90,7 @@ class TrainingPanel(ctk.CTkFrame):
         self.progress_bar = ctk.CTkProgressBar(
             self.controls_card,
             fg_color=st.BG_INPUT,
-            progress_color=st.ACCENT_PRIMARY,
+            progress_color=st.ACCENT_SECONDARY,
             corner_radius=st.CORNER_RADIUS_SM
         )
         self.progress_bar.grid(row=3, column=0, columnspan=2, padx=20, pady=(2, 20), sticky="ew")
@@ -104,25 +104,25 @@ class TrainingPanel(ctk.CTkFrame):
         
         ctk.CTkLabel(
             self.stats_card,
-            text="REAL-TIME METRICS",
-            font=st.FONT_HEADER,
-            text_color=st.TEXT_MUTED
+            text="LIVE NEURAL METRICS",
+            font=st.FONT_CODE,
+            text_color=st.ACCENT_SECONDARY
         ).grid(row=0, column=0, columnspan=2, padx=20, pady=(18, 10), sticky="w")
         
         # Epoch Tracker Grid Card
         self.epoch_box = ctk.CTkFrame(self.stats_card, fg_color=st.BG_INPUT, corner_radius=st.CORNER_RADIUS_MD)
         self.epoch_box.grid(row=1, column=0, padx=(20, 10), pady=(5, 20), sticky="nsew")
-        self.epoch_label = ctk.CTkLabel(self.epoch_box, text="Epoch", font=st.FONT_MUTED_SMALL, text_color=st.TEXT_MUTED)
+        self.epoch_label = ctk.CTkLabel(self.epoch_box, text="EPOCH", font=st.FONT_CODE, text_color=st.TEXT_MUTED)
         self.epoch_label.pack(padx=10, pady=(10, 0))
-        self.epoch_val = ctk.CTkLabel(self.epoch_box, text="0 / 40", font=(st.FONT_FAMILY, 20, "bold"), text_color=st.TEXT_MAIN)
+        self.epoch_val = ctk.CTkLabel(self.epoch_box, text="0 / 40", font=(st.FONT_CODE_FAMILY, 20, "bold"), text_color=st.ACCENT_PRIMARY)
         self.epoch_val.pack(padx=10, pady=(2, 10))
         
         # Loss Tracker Grid Card
         self.loss_box = ctk.CTkFrame(self.stats_card, fg_color=st.BG_INPUT, corner_radius=st.CORNER_RADIUS_MD)
         self.loss_box.grid(row=1, column=1, padx=(10, 20), pady=(5, 20), sticky="nsew")
-        self.loss_label = ctk.CTkLabel(self.loss_box, text="Loss", font=st.FONT_MUTED_SMALL, text_color=st.TEXT_MUTED)
+        self.loss_label = ctk.CTkLabel(self.loss_box, text="LOSS", font=st.FONT_CODE, text_color=st.TEXT_MUTED)
         self.loss_label.pack(padx=10, pady=(10, 0))
-        self.loss_val = ctk.CTkLabel(self.loss_box, text="0.0000", font=(st.FONT_FAMILY, 20, "bold"), text_color=st.TEXT_MAIN)
+        self.loss_val = ctk.CTkLabel(self.loss_box, text="0.0000", font=(st.FONT_CODE_FAMILY, 20, "bold"), text_color=st.ACCENT_SECONDARY)
         self.loss_val.pack(padx=10, pady=(2, 10))
         
         # 3. Dataset Info Card
@@ -132,20 +132,20 @@ class TrainingPanel(ctk.CTkFrame):
         
         ctk.CTkLabel(
             self.dataset_card,
-            text="DATASET STATISTICS",
-            font=st.FONT_HEADER,
+            text="CORPUS SPECIFICATIONS",
+            font=st.FONT_CODE,
             text_color=st.TEXT_MUTED
         ).grid(row=0, column=0, padx=20, pady=(15, 8), sticky="w")
         
-        self._create_stats_row(self.dataset_card, "Dataset File:", "data/conversations.txt", 1)
-        self._create_stats_row(self.dataset_card, "Conversation Pairs:", "10 turns", 2)
-        self._create_stats_row(self.dataset_card, "Sequence Truncation:", "32 tokens", 3)
+        self._create_stats_row(self.dataset_card, "SOURCE FILE:", "conversations.txt", 1)
+        self._create_stats_row(self.dataset_card, "TOKEN PAIRS:", "10 turns", 2)
+        self._create_stats_row(self.dataset_card, "SEQ DENSITY:", "32 tokens", 3)
         ctk.CTkLabel(self.dataset_card, text="", height=8).grid(row=4, column=0)
         
         # ==========================================
         # RIGHT COLUMN: GRAPH CANVAS EMBED
         # ==========================================
-        self.right_container = ctk.CTkFrame(self, fg_color=st.BG_CARD, corner_radius=st.CORNER_RADIUS_LG)
+        self.right_container = ctk.CTkFrame(self, fg_color=st.BG_CARD, border_width=1, border_color=st.ACCENT_SECONDARY, corner_radius=st.CORNER_RADIUS_LG)
         self.right_container.grid(row=0, column=1, padx=(10, 20), pady=20, sticky="nsew")
         self.right_container.grid_columnconfigure(0, weight=1)
         self.right_container.grid_rowconfigure(1, weight=1)
@@ -153,7 +153,7 @@ class TrainingPanel(ctk.CTkFrame):
         # Plot Header
         self.plot_title = ctk.CTkLabel(
             self.right_container,
-            text="📈 Loss Reduction History",
+            text="📊 LOSS REDUCTION GRADIENT",
             font=st.FONT_SUBTITLE,
             text_color=st.TEXT_MAIN
         )
@@ -164,21 +164,20 @@ class TrainingPanel(ctk.CTkFrame):
         self.plot_frame.grid(row=1, column=0, padx=15, pady=(5, 15), sticky="nsew")
         
         # Setup Figure and Subplot
-        # We specify background colors to integrate cleanly with CustomTkinter styles
         self.fig, self.ax = plt.subplots(figsize=(5, 3.8), facecolor=st.BG_CARD)
         self.ax.set_facecolor(st.BG_INPUT)
         
         # Configure initial chart styling
-        self.ax.set_title("Training Loss over Epochs", color=st.TEXT_MAIN, fontsize=10, pad=10)
-        self.ax.set_xlabel("Epoch", color=st.TEXT_MUTED, fontsize=8)
-        self.ax.set_ylabel("Loss", color=st.TEXT_MUTED, fontsize=8)
+        self.ax.set_title("Training Loss Gradient", color=st.TEXT_MAIN, fontsize=10, pad=10)
+        self.ax.set_xlabel("EPOCH", color=st.TEXT_MUTED, fontsize=8)
+        self.ax.set_ylabel("LOSS", color=st.TEXT_MUTED, fontsize=8)
         self.ax.tick_params(colors=st.TEXT_MUTED, labelsize=8)
         
         # Hide standard border lines (spines) for modern look
         for spine in self.ax.spines.values():
             spine.set_color(st.BG_CARD)
             
-        self.ax.grid(True, linestyle="--", alpha=0.15, color="#ffffff")
+        self.ax.grid(True, linestyle="--", alpha=0.1, color="#ffffff")
         
         # Embed Figure into Tkinter Widget via FigureCanvasTkAgg
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_frame)
@@ -189,10 +188,10 @@ class TrainingPanel(ctk.CTkFrame):
         frame.grid(row=row_idx, column=0, padx=20, pady=4, sticky="ew")
         frame.grid_columnconfigure(1, weight=1)
         
-        lbl = ctk.CTkLabel(frame, text=label_text, font=st.FONT_BODY, text_color=st.TEXT_MUTED)
+        lbl = ctk.CTkLabel(frame, text=label_text, font=st.FONT_CODE, text_color=st.TEXT_MUTED)
         lbl.grid(row=0, column=0, sticky="w")
         
-        val = ctk.CTkLabel(frame, text=val_text, font=st.FONT_BODY, text_color=st.TEXT_MAIN)
+        val = ctk.CTkLabel(frame, text=val_text, font=st.FONT_CODE, text_color=st.TEXT_MAIN)
         val.grid(row=0, column=1, sticky="e")
 
     def update_training_progress(self, current_epoch: int, max_epochs: int, loss: float):
@@ -203,7 +202,7 @@ class TrainingPanel(ctk.CTkFrame):
         # Set progress bar
         pct = current_epoch / max_epochs
         self.progress_bar.set(pct)
-        self.progress_label.configure(text=f"Training progress: {int(pct * 100)}%")
+        self.progress_label.configure(text=f"SYNTHESIS PROGRESS: {int(pct * 100)}%")
         
         # Append data to histories
         self.epoch_history.append(current_epoch)
@@ -212,11 +211,11 @@ class TrainingPanel(ctk.CTkFrame):
         # Redraw the loss plot in place
         self.ax.clear()
         self.ax.set_facecolor(st.BG_INPUT)
-        self.ax.set_title("Training Loss over Epochs", color=st.TEXT_MAIN, fontsize=10, pad=10)
-        self.ax.set_xlabel("Epoch", color=st.TEXT_MUTED, fontsize=8)
-        self.ax.set_ylabel("Loss", color=st.TEXT_MUTED, fontsize=8)
+        self.ax.set_title("Training Loss Gradient", color=st.TEXT_MAIN, fontsize=10, pad=10)
+        self.ax.set_xlabel("EPOCH", color=st.TEXT_MUTED, fontsize=8)
+        self.ax.set_ylabel("LOSS", color=st.TEXT_MUTED, fontsize=8)
         self.ax.tick_params(colors=st.TEXT_MUTED, labelsize=8)
-        self.ax.grid(True, linestyle="--", alpha=0.15, color="#ffffff")
+        self.ax.grid(True, linestyle="--", alpha=0.1, color="#ffffff")
         for spine in self.ax.spines.values():
             spine.set_color(st.BG_CARD)
             
@@ -224,11 +223,11 @@ class TrainingPanel(ctk.CTkFrame):
         self.ax.plot(
             self.epoch_history, 
             self.loss_history, 
-            color=st.ACCENT_LIGHT, 
+            color=st.ACCENT_SECONDARY, 
             marker="o", 
             markersize=4,
             linewidth=2, 
-            label="Cross Entropy Loss"
+            label="Neural Loss"
         )
         self.ax.legend(facecolor=st.BG_CARD, edgecolor="none", labelcolor=st.TEXT_MAIN, fontsize=8)
         

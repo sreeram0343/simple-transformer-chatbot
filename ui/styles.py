@@ -1,40 +1,47 @@
 # Styles and UI Design Tokens for the Transformer Chatbot Dashboard
+# Updated to "Neural Cyber-Noir" Design System
 
-# Color Palette (Dark Theme / Catppuccin and Claude-inspired Slate Theme)
-BG_MAIN = "#1e1e2e"          # Main window background (deep dark violet-slate)
-BG_PANEL = "#252538"         # Sidebars and card backgrounds
-BG_CARD = "#2c2c44"          # Widget card containers and panels
-BG_INPUT = "#181825"         # Input entries background
-TEXT_MAIN = "#f8f9fa"        # Primary white text
-TEXT_MUTED = "#a9afb8"       # Secondary muted gray text
-ACCENT_PRIMARY = "#7b2cbf"   # Brand primary (deep purple)
-ACCENT_LIGHT = "#9d4edd"     # Brand highlight (light purple)
-ACCENT_HOVER = "#5a189a"     # Brand primary hover color
+# Color Palette (Cyber-Noir Theme)
+BG_MAIN = "#121221"          # Main background (surface)
+BG_PANEL = "#1e1e2e"         # Surface container (sidebar/header)
+BG_CARD = "#1a1a2a"          # Surface container low
+BG_INPUT = "#0d0d1c"         # Surface container lowest
+TEXT_MAIN = "#e3e0f7"        # On-surface
+TEXT_MUTED = "#cfc2d5"       # On-surface-variant
+
+# Accents & Branding
+ACCENT_PRIMARY = "#deb7ff"   # Electric Indigo (Primary)
+ACCENT_PRIMARY_CONTAINER = "#7b2cbf" 
+ACCENT_SECONDARY = "#4fdbcc" # Neon Teal (Secondary)
+ACCENT_SECONDARY_CONTAINER = "#00b1a3"
+ACCENT_HOVER = "#8234c6"     # Inverse primary
 
 # Chat Bubbles Design
-BUBBLE_USER_BG = "#7b2cbf"   # User bubble background (purple)
-BUBBLE_USER_FG = "#ffffff"   # User bubble text color
-BUBBLE_BOT_BG = "#32324d"    # Bot bubble background (slate gray)
-BUBBLE_BOT_FG = "#f8f9fa"    # Bot bubble text color
+BUBBLE_USER_BG = "#7b2cbf"   # Electric Indigo to Deep Violet gradient base
+BUBBLE_USER_FG = "#ffffff"
+BUBBLE_BOT_BG = "#1e1e2e"    # Frosted glass look base
+BUBBLE_BOT_FG = "#e3e0f7"
+BUBBLE_BOT_BORDER = "#4fdbcc" # Neon Teal border
 
 # Alert / Status Colors
-COLOR_SUCCESS = "#2ec4b6"    # Green (Ready status)
-COLOR_WARNING = "#ffb703"    # Orange/Yellow (Training status)
-COLOR_ERROR = "#e63946"      # Red (Offline/Error status)
+COLOR_SUCCESS = "#4fdbcc"    # Neon Teal (Online)
+COLOR_WARNING = "#deb7ff"    # Electric Indigo (Processing)
+COLOR_ERROR = "#ffb4ab"      # Error
 
 # Typography Configuration
-FONT_FAMILY = "Segoe UI"
-FONT_CODE_FAMILY = "Consolas"
+# Prefer Geist and JetBrains Mono if available, fallback to system defaults
+FONT_FAMILY = "Geist"
+FONT_CODE_FAMILY = "JetBrains Mono"
 
 # Font Sizes & Weights
-FONT_TITLE = (FONT_FAMILY, 18, "bold")
-FONT_SUBTITLE = (FONT_FAMILY, 14, "bold")
-FONT_HEADER = (FONT_FAMILY, 12, "bold")
-FONT_BODY = (FONT_FAMILY, 11, "normal")
-FONT_MUTED_SMALL = (FONT_FAMILY, 9, "normal")
-FONT_CODE = (FONT_CODE_FAMILY, 10, "normal")
+FONT_TITLE = (FONT_FAMILY, 24, "bold")      # Headline-md
+FONT_SUBTITLE = (FONT_FAMILY, 18, "bold")   # Headline-sm
+FONT_HEADER = (FONT_FAMILY, 14, "bold")     # Body-md bold
+FONT_BODY = (FONT_FAMILY, 12, "normal")     # Body-md
+FONT_MUTED_SMALL = (FONT_FAMILY, 10, "normal")
+FONT_CODE = (FONT_CODE_FAMILY, 11, "normal") # Data-display
 
 # Component Dimensions & Rounding
-CORNER_RADIUS_SM = 6         # Small elements (buttons, small status panels)
-CORNER_RADIUS_MD = 12        # Medium elements (speech bubbles, entry fields)
-CORNER_RADIUS_LG = 16        # Large panels (cards, sidebars, main frames)
+CORNER_RADIUS_SM = 4         # rounded-sm
+CORNER_RADIUS_MD = 8         # rounded-lg
+CORNER_RADIUS_LG = 12        # rounded-xl
