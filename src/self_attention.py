@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from typing import Tuple, Optional
 
 class SelfAttention(nn.Module):
     """
@@ -19,65 +20,57 @@ class SelfAttention(nn.Module):
     Mathematical Formula:
         Attention(Q, K, V) = softmax( (Q * K^T) / sqrt(d_k) + Mask ) * V
     """
-    def __init__(self, d_model: int, d_k: int):
+    def __init__(self, d_model: int, d_k: int) -> None:
         """
         Args:
-            d_model: The embedding dimension of the input sequence.
-            d_k: The projection dimension for Queries and Keys (and Values in this simple head).
+            d_model (int): The embedding dimension of the input sequence.
+            d_k (int): The projection dimension for Queries and Keys.
         """
         super(SelfAttention, self).__init__()
-        self.d_k = d_k
+        self.d_k: int = d_k
         
         # Learnable weight projections for Query, Key, and Value
         # These project the input embedding dimension (d_model) into the attention subspace (d_k)
-        self.q_proj = nn.Linear(d_model, d_k, bias=False)
-        self.k_proj = nn.Linear(d_model, d_k, bias=False)
-        self.v_proj = nn.Linear(d_model, d_k, bias=False)
+        self.q_proj: nn.Linear = nn.Linear(d_model, d_k, bias=False)
+        self.k_proj: nn.Linear = nn.Linear(d_model, d_k, bias=False)
+        self.v_proj: nn.Linear = nn.Linear(d_model, d_k, bias=False)
 
-    def forward(self, x: torch.Tensor, mask: torch.Tensor = None) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
-            x: Input embeddings of shape (batch_size, seq_len, d_model)
-            mask: Optional tensor of shape (seq_len, seq_len) or (batch_size, 1, seq_len, seq_len)
+            x (torch.Tensor): Input embeddings of shape (batch_size, seq_len, d_model)
+            mask (Optional[torch.Tensor]): Optional tensor of shape (seq_len, seq_len) or (batch_size, 1, seq_len, seq_len)
                   used to block attention to future tokens (causal/look-ahead mask).
         Returns:
-            output: Attention-contextualized embeddings: shape (batch_size, seq_len, d_k)
-            attention_weights: Normalized attention scores: shape (batch_size, seq_len, seq_len)
+            Tuple[torch.Tensor, torch.Tensor]: 
+                - output: Attention-contextualized embeddings: shape (batch_size, seq_len, d_k)
+                - attention_weights: Normalized attention scores: shape (batch_size, seq_len, seq_len)
         """
         batch_size, seq_len, d_model = x.shape
         
         # Step 1: Project input X into Query, Key, and Value tensors
-        # x shape: (batch_size, seq_len, d_model)
         # Q, K, V shapes: (batch_size, seq_len, d_k)
-        Q = self.q_proj(x)
-        K = self.k_proj(x)
-        V = self.v_proj(x)
+        Q: torch.Tensor = self.q_proj(x)
+        K: torch.Tensor = self.k_proj(x)
+        V: torch.Tensor = self.v_proj(x)
         
         # Step 2: Compute raw attention scores (dot product between Query and Key)
-        # We need to multiply Q (batch_size, seq_len, d_k) by K^T.
-        # To transpose K specifically along the sequence length and dimension axes:
-        # K.transpose(-2, -1) has shape: (batch_size, d_k, seq_len)
         # Matrix multiplication: (batch_size, seq_len, d_k) x (batch_size, d_k, seq_len) -> (batch_size, seq_len, seq_len)
-        scores = torch.matmul(Q, K.transpose(-2, -1))
+        scores: torch.Tensor = torch.matmul(Q, K.transpose(-2, -1))
         
         # Step 3: Scale the scores by sqrt(d_k) to prevent extremely large values
-        # Large dot products would lead to extremely small gradients in the softmax region.
         scores = scores / math.sqrt(self.d_k)
         
         # Step 4: Apply the Causal Mask (if provided)
-        # For a chatbot, tokens cannot look into the future. 
-        # The mask has 0 for allowed positions and -inf (or -1e9) for blocked positions.
         if mask is not None:
-            # Add mask. Any position with -1e9 will yield e^(-1e9) ~ 0 in softmax.
             scores = scores + mask
             
-        # Step 5: Normalize attention scores along the last dimension (each query gets a probability distribution)
-        # Shape: (batch_size, seq_len, seq_len)
-        attention_weights = F.softmax(scores, dim=-1)
+        # Step 5: Normalize attention scores along the last dimension
+        attention_weights: torch.Tensor = F.softmax(scores, dim=-1)
         
         # Step 6: Multiply the weights by the Values (weighted sum of content)
         # (batch_size, seq_len, seq_len) x (batch_size, seq_len, d_k) -> (batch_size, seq_len, d_k)
-        output = torch.matmul(attention_weights, V)
+        output: torch.Tensor = torch.matmul(attention_weights, V)
         
         return output, attention_weights
 

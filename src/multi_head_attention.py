@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+from typing import Tuple, Optional
 
 class MultiHeadAttention(nn.Module):
     """
@@ -12,8 +13,6 @@ class MultiHeadAttention(nn.Module):
     the embedding dimension (d_model) into 'num_heads' smaller spaces (of size d_k).
     Each head performs self-attention independently in parallel. This allows the model to simultaneously
     attend to information from different representation subspaces at different positions. 
-    For example, one head might learn to connect adjectives with nouns, while another connects pronouns
-    with their referenced nouns.
     
     Tensor Shape Walkthrough:
     - Input: (batch_size, seq_len, d_model)
@@ -24,15 +23,15 @@ class MultiHeadAttention(nn.Module):
     - Concatenated heads: (batch_size, seq_len, d_model)
     - Final linear output projection: (batch_size, seq_len, d_model)
     """
-    def __init__(self, d_model: int, num_heads: int):
+    def __init__(self, d_model: int, num_heads: int) -> None:
         """
         Args:
-            d_model: The input embedding dimension (must be divisible by num_heads).
-            num_heads: The number of attention heads.
+            d_model (int): The input embedding dimension (must be divisible by num_heads).
+            num_heads (int): The number of attention heads.
         """
         super(MultiHeadAttention, self).__init__()
-        self.d_model = d_model
-        self.num_heads = num_heads
+        self.d_model: int = d_model
+        self.num_heads: int = num_heads
         
         # Ensure that the embedding dimension is perfectly divisible by the number of heads
         if d_model % num_heads != 0:
@@ -41,79 +40,60 @@ class MultiHeadAttention(nn.Module):
             )
             
         # The dimension of each individual head's Query, Key, and Value space
-        self.d_k = d_model // num_heads
+        self.d_k: int = d_model // num_heads
         
         # Linear projection layers for Query, Key, and Value
-        # We can project all heads in parallel using a single large weight matrix of size (d_model, d_model).
-        # This is mathematically equivalent and much faster than having individual layers per head.
-        self.q_proj = nn.Linear(d_model, d_model, bias=False)
-        self.k_proj = nn.Linear(d_model, d_model, bias=False)
-        self.v_proj = nn.Linear(d_model, d_model, bias=False)
+        self.q_proj: nn.Linear = nn.Linear(d_model, d_model, bias=False)
+        self.k_proj: nn.Linear = nn.Linear(d_model, d_model, bias=False)
+        self.v_proj: nn.Linear = nn.Linear(d_model, d_model, bias=False)
         
         # The final output linear layer to project the concatenated head outputs back
-        self.out_proj = nn.Linear(d_model, d_model, bias=False)
+        self.out_proj: nn.Linear = nn.Linear(d_model, d_model, bias=False)
+        self.last_attention_weights: Optional[torch.Tensor] = None
 
-    def forward(self, x: torch.Tensor, mask: torch.Tensor = None) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor, mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
-            x: Input embeddings of shape (batch_size, seq_len, d_model)
-            mask: Optional tensor of shape (seq_len, seq_len) or (batch_size, 1, seq_len, seq_len)
+            x (torch.Tensor): Input embeddings of shape (batch_size, seq_len, d_model)
+            mask (Optional[torch.Tensor]): Optional tensor of shape (seq_len, seq_len) or (batch_size, 1, seq_len, seq_len)
                   used to mask future tokens during decoding.
         Returns:
-            output: Contextualized output embeddings: shape (batch_size, seq_len, d_model)
-            attention_weights: Normalized attention weights of the first head (for visualization):
+            Tuple[torch.Tensor, torch.Tensor]: 
+                - output: Contextualized output embeddings: shape (batch_size, seq_len, d_model)
+                - attention_weights: Normalized attention weights of the first head (for visualization):
                                shape (batch_size, seq_len, seq_len)
         """
         batch_size, seq_len, d_model = x.shape
         
         # Step 1: Project input into Q, K, and V
-        # Output shape: (batch_size, seq_len, d_model)
-        Q = self.q_proj(x)
-        K = self.k_proj(x)
-        V = self.v_proj(x)
+        Q: torch.Tensor = self.q_proj(x)
+        K: torch.Tensor = self.k_proj(x)
+        V: torch.Tensor = self.v_proj(x)
         
         # Step 2: Split the projected tensors into multiple heads
-        # - Original shape: (batch_size, seq_len, d_model)
-        # - Reshaped shape: (batch_size, seq_len, num_heads, d_k)
-        # - Transposed shape: (batch_size, num_heads, seq_len, d_k)
-        # Transposing swaps seq_len and num_heads. This lets PyTorch treat num_heads
-        # as a batch dimension, allowing us to compute attention on all heads in parallel.
         Q = Q.view(batch_size, seq_len, self.num_heads, self.d_k).transpose(1, 2)
         K = K.view(batch_size, seq_len, self.num_heads, self.d_k).transpose(1, 2)
         V = V.view(batch_size, seq_len, self.num_heads, self.d_k).transpose(1, 2)
         
         # Step 3: Compute raw attention scores (scaled dot product)
-        # Q: (batch_size, num_heads, seq_len, d_k)
-        # K^T: (batch_size, num_heads, d_k, seq_len)
-        # Scores shape: (batch_size, num_heads, seq_len, seq_len)
-        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.d_k)
+        scores: torch.Tensor = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.d_k)
         
         # Step 4: Apply causal masking (if provided)
-        # Since mask is shape (seq_len, seq_len) or (batch_size, 1, seq_len, seq_len),
-        # PyTorch will broadcast it to (batch_size, num_heads, seq_len, seq_len) automatically.
         if mask is not None:
             scores = scores + mask
             
         # Step 5: Softmax normalization to get attention probabilities
-        # Shape: (batch_size, num_heads, seq_len, seq_len)
-        attention_weights = F.softmax(scores, dim=-1)
+        attention_weights: torch.Tensor = F.softmax(scores, dim=-1)
         self.last_attention_weights = attention_weights.detach()
         
         # Step 6: Multiply attention weights by Value vectors
-        # (batch_size, num_heads, seq_len, seq_len) x (batch_size, num_heads, seq_len, d_k)
-        # Output shape: (batch_size, num_heads, seq_len, d_k)
-        head_outputs = torch.matmul(attention_weights, V)
+        head_outputs: torch.Tensor = torch.matmul(attention_weights, V)
         
         # Step 7: Concatenate all heads back together
-        # - Transpose back: (batch_size, seq_len, num_heads, d_k)
-        # - View/reshape: (batch_size, seq_len, d_model) (merges the heads together)
-        # contiguous() is called to allocate a new contiguous chunk of memory after transpose,
-        # which is required by PyTorch before calling view().
-        concat_outputs = head_outputs.transpose(1, 2).contiguous().view(batch_size, seq_len, d_model)
+        concat_outputs: torch.Tensor = head_outputs.transpose(1, 2).contiguous().view(batch_size, seq_len, d_model)
         
         # Step 8: Apply the final linear output projection
-        # Shape: (batch_size, seq_len, d_model)
-        output = self.out_proj(concat_outputs)
+        output: torch.Tensor = self.out_proj(concat_outputs)
         
         # We return the output and the attention weights of the first head for inspection
         return output, attention_weights[:, 0, :, :]
