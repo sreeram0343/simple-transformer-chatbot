@@ -18,12 +18,13 @@ class TestTokenizer(unittest.TestCase):
         self.assertEqual(text.lower(), decoded)
 
     def test_unknown_token(self):
-        text = "Unknown word test"
+        text = "Hello unknown word test"
         encoded = self.tokenizer.encode(text)
-        # "word" and "test" are unknown
+        # "Hello" is known, others are unknown
         self.assertEqual(encoded[0], self.tokenizer.vocab["hello"])
         self.assertEqual(encoded[1], self.tokenizer.vocab["<UNK>"])
         self.assertEqual(encoded[2], self.tokenizer.vocab["<UNK>"])
+        self.assertEqual(encoded[3], self.tokenizer.vocab["<UNK>"])
 
     def test_eos_token(self):
         text = "Hello"
