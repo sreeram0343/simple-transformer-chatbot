@@ -1,5 +1,6 @@
 from collections import Counter
 import os
+from typing import Dict, List, Tuple, Optional
 
 class Tokenizer:
     """A simple word-level Tokenizer designed for our custom chatbot.
@@ -9,32 +10,31 @@ class Tokenizer:
     separation, and end-of-sequence marking.
 
     Attributes:
-        vocab (dict): Mapping from word strings to integer IDs.
-        inv_vocab (dict): Mapping from integer IDs back to word strings.
-        special_tokens (dict): Internal map of special token IDs.
+        vocab (Dict[str, int]): Mapping from word strings to integer IDs.
+        inv_vocab (Dict[int, str]): Mapping from integer IDs back to word strings.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializes the tokenizer with basic special tokens."""
         # 1. Initialize vocabulary with special tokens
-        self.vocab = {
+        self.vocab: Dict[str, int] = {
             "<PAD>": 0,
             "<UNK>": 1,
             "<SEP>": 2,
             "<EOS>": 3
         }
         # Inverse vocabulary to easily decode token IDs back into words
-        self.inv_vocab = {v: k for k, v in self.vocab.items()}
+        self.inv_vocab: Dict[int, str] = {v: k for k, v in self.vocab.items()}
 
-    def train(self, texts: list[str]):
+    def train(self, texts: List[str]) -> None:
         """Builds the vocabulary from a list of sentence strings.
 
         Args:
-            texts (list[str]): A list of strings to use for vocabulary building.
+            texts (List[str]): A list of strings to use for vocabulary building.
         """
-        counter = Counter()
+        counter: Counter = Counter()
         for text in texts:
             # Tokenize by splitting on spaces and lowercasing
-            words = text.lower().split()
+            words: List[str] = text.lower().split()
             counter.update(words)
             
         # Assign a unique sequential integer ID to every unique word
@@ -45,7 +45,7 @@ class Tokenizer:
         # Re-build inverse vocabulary for decoding
         self.inv_vocab = {v: k for k, v in self.vocab.items()}
 
-    def encode(self, text: str, add_eos: bool = False) -> list[int]:
+    def encode(self, text: str, add_eos: bool = False) -> List[int]:
         """Converts a raw text string into a list of token IDs.
 
         Args:
@@ -53,29 +53,29 @@ class Tokenizer:
             add_eos (bool): Whether to append the <EOS> token ID at the end.
 
         Returns:
-            list[int]: A list of integer token IDs representing the text.
+            List[int]: A list of integer token IDs representing the text.
         """
-        words = text.lower().split()
-        token_ids = [self.vocab.get(word, self.vocab["<UNK>"]) for word in words]
+        words: List[str] = text.lower().split()
+        token_ids: List[int] = [self.vocab.get(word, self.vocab["<UNK>"]) for word in words]
         
         if add_eos:
             token_ids.append(self.vocab["<EOS>"])
             
         return token_ids
 
-    def decode(self, token_ids: list[int], skip_special: bool = True) -> str:
+    def decode(self, token_ids: List[int], skip_special: bool = True) -> str:
         """Converts a list of token IDs back into a readable string.
 
         Args:
-            token_ids (list[int]): A list of token IDs to decode.
+            token_ids (List[int]): A list of token IDs to decode.
             skip_special (bool): If True, special tokens like <PAD> are omitted.
 
         Returns:
             str: The reconstructed string from the token IDs.
         """
-        words = []
+        words: List[str] = []
         for tid in token_ids:
-            word = self.inv_vocab.get(tid, "<UNK>")
+            word: str = self.inv_vocab.get(tid, "<UNK>")
             
             # Skip special tokens if requested, except for displaying details in debugging
             if skip_special and word in ["<PAD>", "<UNK>", "<SEP>", "<EOS>"]:
@@ -86,7 +86,7 @@ class Tokenizer:
         return " ".join(words)
 
 
-def load_conversations(file_path: str) -> list[tuple[str, str]]:
+def load_conversations(file_path: str) -> List[Tuple[str, str]]:
     """Loads conversation pairs from a text file.
 
     Expects a file where each line is formatted as: user_prompt|bot_response.
@@ -95,12 +95,12 @@ def load_conversations(file_path: str) -> list[tuple[str, str]]:
         file_path (str): The path to the conversations text file.
 
     Returns:
-        list[tuple[str, str]]: A list of tuples containing (user, bot) strings.
+        List[Tuple[str, str]]: A list of tuples containing (user, bot) strings.
 
     Raises:
         FileNotFoundError: If the specified file_path does not exist.
     """
-    pairs = []
+    pairs: List[Tuple[str, str]] = []
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Dataset not found at: {file_path}")
         
@@ -109,8 +109,10 @@ def load_conversations(file_path: str) -> list[tuple[str, str]]:
             line = line.strip()
             if not line or "|" not in line:
                 continue
-            user, bot = line.split("|")
-            pairs.append((user.strip(), bot.strip()))
+            parts: List[str] = line.split("|")
+            if len(parts) >= 2:
+                user, bot = parts[0], parts[1]
+                pairs.append((user.strip(), bot.strip()))
             
     return pairs
 
