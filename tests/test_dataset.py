@@ -1,7 +1,13 @@
 import unittest
 import torch
-from src.dataset import ConversationDataset
-from src.tokenizer import Tokenizer
+import sys
+import os
+
+# Add 'src' directory to Python path
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
+
+from dataset import ConversationDataset
+from tokenizer import Tokenizer
 
 class TestDataset(unittest.TestCase):
     def setUp(self):
