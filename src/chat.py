@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import torch
+from typing import List, Tuple, Dict, Optional
 
 # Add 'src' directory to Python path to ensure clean imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -70,47 +71,68 @@ class ChatbotPipeline:
         # 4. Initialize Conversation Memory
         self.history = []  # List of (user_message, bot_response) tuples
 
-    def generate_response(self, user_message: str, max_new_tokens: int = 20) -> str:
+    def generate_response(self, user_message: str, max_new_tokens: int = 20, temperature: float = 1.0, top_k: int = 0) -> str:
         """
         Runs the autoregressive inference pipeline with conversation memory.
+        
+        Args:
+            user_message (str): The raw text message from the user.
+            max_new_tokens (int): Maximum number of tokens to generate.
+            temperature (float): Sampling temperature. Higher values make the output more random.
+            top_k (int): Top-k filtering. Only considers the top k tokens with the highest probability.
+                         Set to 0 to disable (default: greedy if top_k=0 and temp=1.0).
+                         
+        Returns:
+            str: The decoded bot response.
         """
-        sep_id = self.tokenizer.vocab["<SEP>"]
-        eos_id = self.tokenizer.vocab["<EOS>"]
+        sep_id: int = self.tokenizer.vocab["<SEP>"]
+        eos_id: int = self.tokenizer.vocab["<EOS>"]
         
         # Step A: Build input token sequence with Conversation Memory
-        input_ids = []
+        input_ids: List[int] = []
         for prev_user, prev_bot in self.history:
             # Add past prompt + <SEP> + past response + <EOS>
             input_ids += self.tokenizer.encode(prev_user) + [sep_id] + self.tokenizer.encode(prev_bot, add_eos=True)
             
         # Add current user prompt + <SEP>
-        current_prompt_ids = self.tokenizer.encode(user_message) + [sep_id]
+        current_prompt_ids: List[int] = self.tokenizer.encode(user_message) + [sep_id]
         input_ids += current_prompt_ids
         
         # Keep track of where the current bot response begins in our input sequence
-        response_start_idx = len(input_ids)
+        response_start_idx: int = len(input_ids)
         
         # Step B: Autoregressive Loop
         for _ in range(max_new_tokens):
             # Convert list of token IDs to a PyTorch tensor: shape (1, seq_len)
-            input_tensor = torch.tensor([input_ids], dtype=torch.long, device=self.device)
+            input_tensor: torch.Tensor = torch.tensor([input_ids], dtype=torch.long, device=self.device)
             
             # Create the causal mask for the current sequence length
-            seq_len = input_tensor.size(1)
-            mask_template = torch.tril(torch.ones(seq_len, seq_len, device=self.device))
-            causal_mask = torch.zeros(seq_len, seq_len, device=self.device).masked_fill(mask_template == 0, float('-inf'))
+            seq_len: int = input_tensor.size(1)
+            mask_template: torch.Tensor = torch.tril(torch.ones(seq_len, seq_len, device=self.device))
+            causal_mask: torch.Tensor = torch.zeros(seq_len, seq_len, device=self.device).masked_fill(mask_template == 0, float('-inf'))
             
             # Pass through the model
             with torch.no_grad():
                 # logits shape: (1, seq_len, vocab_size)
-                logits = self.model(input_tensor, mask=causal_mask)
+                logits: torch.Tensor = self.model(input_tensor, mask=causal_mask)
                 
             # Get the logits of the last token in the sequence (next word logits)
             # shape: (vocab_size,)
-            next_token_logits = logits[0, -1, :]
+            next_token_logits: torch.Tensor = logits[0, -1, :] / temperature
             
-            # Greedy Search: pick the token ID with the highest score
-            next_token_id = torch.argmax(next_token_logits, dim=-1).item()
+            # Apply Top-k filtering
+            if top_k > 0:
+                indices_to_remove = next_token_logits < torch.topk(next_token_logits, top_k)[0][..., -1, None]
+                next_token_logits[indices_to_remove] = float('-inf')
+            
+            # Convert to probabilities
+            probs: torch.Tensor = torch.softmax(next_token_logits, dim=-1)
+            
+            # Sample or take argmax
+            if temperature == 0 or (top_k == 0 and temperature == 1.0):
+                next_token_id = torch.argmax(probs, dim=-1).item()
+            else:
+                next_token_id = torch.multinomial(probs, num_samples=1).item()
             
             # Append the predicted token to the input sequence
             input_ids.append(next_token_id)
@@ -120,8 +142,8 @@ class ChatbotPipeline:
                 break
                 
         # Step C: Extract and decode only the generated response
-        generated_token_ids = input_ids[response_start_idx:]
-        response_text = self.tokenizer.decode(generated_token_ids, skip_special=True)
+        generated_token_ids: List[int] = input_ids[response_start_idx:]
+        response_text: str = self.tokenizer.decode(generated_token_ids, skip_special=True)
         
         # Save the new exchange to memory
         self.history.append((user_message, response_text))
