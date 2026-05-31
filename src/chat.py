@@ -167,45 +167,46 @@ class ChatbotPipeline:
 # INTERACTIVE CHAT INTERFACE (STAGE 11)
 # =====================================================================
 def run_chat_interface():
-    logger.info("=" * 60)
-    logger.info("         🔮 WELCOME TO THE CUSTOM TRANSFORMER CHATBOT! 🔮")
-    logger.info("=" * 60)
-    logger.info("[*] Loading chatbot pipeline...")
+    print("\n" + "⚡" * 30)
+    print("         🔮 NEURAL ORCHESTRATOR :: CORE INTERFACE 🔮")
+    print("⚡" * 30)
+    logger.info("[*] Initializing neural synaptic pathways...")
     
     try:
         pipeline = ChatbotPipeline(model_path="chatbot_model.pt", vocab_path="vocab.json")
-        logger.info("[+] Chatbot ready! Actively waiting for your inputs.")
-        print("\nCommands:")
-        print(" - Type 'exit' to quit the chatbot.")
-        print(" - Type 'clear' to wipe conversation memory.")
+        logger.info("[+] Synaptic node ONLINE. Ready for neural inquiry.")
+        print("\nSYSTEM COMMANDS:")
+        print(" - 'exit'  :: Terminate session")
+        print(" - 'clear' :: Purge synaptic memory")
         print("-" * 60)
     except Exception as e:
-        logger.error(f"Failed to load chatbot files: {e}")
-        logger.info("[!] Make sure to run 'python train.py' first to train and save the model!")
+        logger.error(f"FATAL: Failed to initialize synaptic node: {e}")
+        logger.info("[!] Ensure 'train.py' has been executed to generate CORE weights.")
         return
 
     while True:
         try:
-            user_input = input("\nYou: ").strip()
+            user_input = input("\n[INQUIRY] > ").strip()
             
             if not user_input:
                 continue
                 
             if user_input.lower() == "exit":
-                logger.info("Goodbye! Have a great day!")
+                logger.info("Session terminated. Synaptic node OFFLINE.")
                 break
                 
             if user_input.lower() == "clear":
                 pipeline.clear_memory()
-                logger.info("Conversation memory cleared!")
+                logger.info("Synaptic memory purged. Fresh state initialized.")
                 continue
                 
             # Generate and print response
-            response = pipeline.generate_response(user_input)
-            print(f"Mini Bot: {response}")
+            # Note: We use default sampling params for now
+            response = pipeline.generate_response(user_input, temperature=0.8, top_k=10)
+            print(f"[RESPONSE] > {response}")
             
         except KeyboardInterrupt:
-            logger.info("Goodbye!")
+            logger.info("\nInterrupted. Synaptic node OFFLINE.")
             break
 
 if __name__ == "__main__":
