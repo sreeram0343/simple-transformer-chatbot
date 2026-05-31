@@ -1,5 +1,6 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
+from typing import List, Tuple, Dict
 from tokenizer import Tokenizer, load_conversations
 
 class ConversationDataset(Dataset):
@@ -11,21 +12,21 @@ class ConversationDataset(Dataset):
     a fixed maximum length.
 
     Attributes:
-        pairs (list[tuple[str, str]]): List of (user_prompt, bot_response) strings.
+        pairs (List[Tuple[str, str]]): List of (user_prompt, bot_response) strings.
         tokenizer (Tokenizer): A trained Tokenizer instance.
         max_len (int): The maximum sequence length.
     """
-    def __init__(self, pairs: list[tuple[str, str]], tokenizer: Tokenizer, max_len: int = 16):
+    def __init__(self, pairs: List[Tuple[str, str]], tokenizer: Tokenizer, max_len: int = 16) -> None:
         """Initializes the ConversationDataset.
 
         Args:
-            pairs (list[tuple[str, str]]): List of (user_prompt, bot_response) strings.
+            pairs (List[Tuple[str, str]]): List of (user_prompt, bot_response) strings.
             tokenizer (Tokenizer): An initialized and trained Tokenizer instance.
             max_len (int): The maximum sequence length to pad/truncate to.
         """
-        self.pairs = pairs
-        self.tokenizer = tokenizer
-        self.max_len = max_len
+        self.pairs: List[Tuple[str, str]] = pairs
+        self.tokenizer: Tokenizer = tokenizer
+        self.max_len: int = max_len
 
     def __len__(self) -> int:
         """Returns the total number of conversation pairs in the dataset.
@@ -35,33 +36,33 @@ class ConversationDataset(Dataset):
         """
         return len(self.pairs)
 
-    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
+    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         """Retrieves a single conversation item from the dataset.
 
         Args:
             idx (int): The index of the item to retrieve.
 
         Returns:
-            dict[str, torch.Tensor]: A dictionary containing 'input_ids' and 'labels' tensors.
+            Dict[str, torch.Tensor]: A dictionary containing 'input_ids' and 'labels' tensors.
         """
         user, bot = self.pairs[idx]
         
         # 1. Encode user prompt and bot response
-        user_ids = self.tokenizer.encode(user)
-        bot_ids = self.tokenizer.encode(bot, add_eos=True)  # Bot response ends with <EOS>
+        user_ids: List[int] = self.tokenizer.encode(user)
+        bot_ids: List[int] = self.tokenizer.encode(bot, add_eos=True)  # Bot response ends with <EOS>
         
         # 2. Combine into a single sequence
         # Format: User_Tokens + <SEP> + Bot_Tokens
-        sep_id = self.tokenizer.vocab["<SEP>"]
-        combined_ids = user_ids + [sep_id] + bot_ids
+        sep_id: int = self.tokenizer.vocab["<SEP>"]
+        combined_ids: List[int] = user_ids + [sep_id] + bot_ids
         
         # 3. Create the targets (labels)
         # We mask out the user's prompt by assigning a label of -100.
         # Length of user prompt + separator:
-        user_prompt_len = len(user_ids) + 1  
+        user_prompt_len: int = len(user_ids) + 1  
         
         # Targets: [-100, -100, ..., bot_id_1, bot_id_2, ..., EOS_id]
-        labels = [-100] * user_prompt_len + bot_ids
+        labels: List[int] = [-100] * user_prompt_len + bot_ids
         
         # 4. Truncate if the sequence exceeds max_len
         if len(combined_ids) > self.max_len:
@@ -71,11 +72,11 @@ class ConversationDataset(Dataset):
         # 5. Pad both sequences to reach max_len
         # We pad inputs with self.tokenizer.vocab["<PAD>"] (ID 0)
         # We pad targets with -100 (so we don't calculate loss on padding tokens either!)
-        padding_length = self.max_len - len(combined_ids)
+        padding_length: int = self.max_len - len(combined_ids)
         
-        pad_id = self.tokenizer.vocab["<PAD>"]
-        input_ids = combined_ids + [pad_id] * padding_length
-        target_labels = labels + [-100] * padding_length
+        pad_id: int = self.tokenizer.vocab["<PAD>"]
+        input_ids: List[int] = combined_ids + [pad_id] * padding_length
+        target_labels: List[int] = labels + [-100] * padding_length
         
         return {
             "input_ids": torch.tensor(input_ids, dtype=torch.long),
